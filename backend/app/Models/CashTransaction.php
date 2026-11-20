@@ -1,0 +1,1 @@
+<?php namespace App\Models;use Illuminate\Database\Eloquent\Model;class CashTransaction extends Model{protected $fillable=['type','category','description','amount','transaction_date','payment_id','created_by'];protected function casts():array{return ['amount'=>'decimal:2','transaction_date'=>'date'];}public function payment(){return $this->belongsTo(Payment::class);}}
