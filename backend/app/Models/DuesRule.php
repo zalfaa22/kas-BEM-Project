@@ -1,1 +1,14 @@
-<?php namespace App\Models;use Illuminate\Database\Eloquent\Model;class DuesRule extends Model{protected $fillable=['name','period','amount','due_day','description','active'];protected function casts():array{return ['amount'=>'decimal:2','active'=>'boolean'];}}
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+
+class DuesRule extends Model
+{
+    protected $fillable = ['name', 'period', 'amount', 'due_day', 'description', 'active'];
+    protected function casts(): array
+    {
+        return ['amount' => 'decimal:2', 'active' => 'boolean'];
+    }
+}

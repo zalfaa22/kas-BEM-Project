@@ -1,1 +1,37 @@
-<?php namespace Database\Seeders;use Illuminate\Database\Seeder;use App\Models\{User,Department,DuesRule,Invoice,Payment,PaymentProof,CashTransaction,Notice};use Illuminate\Support\Facades\Hash;class DatabaseSeeder extends Seeder{public function run():void{$si=Department::create(['name'=>'Sistem Informasi','code'=>'SI']);$ti=Department::create(['name'=>'Teknik Informatika','code'=>'TI']);$pti=Department::create(['name'=>'Pendidikan Teknologi Informasi','code'=>'PTI']);$b=User::create(['name'=>'Nadia Bendahara','nim'=>'245150407111001','email'=>'bendahara@bemfilkom.test','password'=>Hash::make('password'),'role'=>'bendahara','status_anggota'=>'aktif','department_id'=>$si->id]);$k=User::create(['name'=>'Aditya Ketua BEM','nim'=>'245150407111002','email'=>'ketua@bemfilkom.test','password'=>Hash::make('password'),'role'=>'ketua','status_anggota'=>'aktif','department_id'=>$ti->id]);$names=['Alya Putri','Rafi Mahendra','Dimas Pratama','Nabila Zahra','Fikri Ramadhan','Citra Lestari','Bima Saputra','Salsa Anindya','Rizky Firmansyah','Intan Permata'];$deps=[$si,$ti,$pti];foreach($names as $i=>$n)User::create(['name'=>$n,'nim'=>'245150407111'.str_pad((string)($i+10),3,'0',STR_PAD_LEFT),'email'=>'anggota'.($i+1).'@bemfilkom.test','password'=>Hash::make('password'),'role'=>'anggota','status_anggota'=>'aktif','department_id'=>$deps[$i%3]->id]);$rule=DuesRule::create(['name'=>'Iuran Kas Rutin','period'=>'bulanan','amount'=>15000,'due_day'=>10,'description'=>'Iuran rutin anggota BEM FILKOM UB','active'=>true]);$members=User::whereIn('role',['anggota','bendahara','ketua'])->get();foreach($members as $i=>$m){$inv=Invoice::create(['member_id'=>$m->id,'dues_rule_id'=>$rule->id,'period_label'=>'November 2026','amount'=>15000,'due_date'=>'2026-11-10','status'=>$i%4===0?'lunas':($i%4===1?'menunggu_verifikasi':'belum_bayar')]);if($inv->status==='lunas'){$pay=Payment::create(['invoice_id'=>$inv->id,'member_id'=>$m->id,'amount'=>15000,'paid_at'=>now()->subDays(3),'status'=>'diterima','verified_by'=>$b->id,'verified_at'=>now()->subDays(2)]);PaymentProof::create(['original_name'=>'contoh-bukti-transfer.jpg','path_file'=>'demo/sample-proof.jpg','file_size'=>180000,'uploaded_at'=>now()->subDays(3),'payment_id'=>$pay->id]);CashTransaction::create(['type'=>'pemasukan','category'=>'Iuran anggota','description'=>'Pembayaran '.$m->name.' - November 2026','amount'=>15000,'transaction_date'=>now()->subDays(2),'payment_id'=>$pay->id,'created_by'=>$b->id]);}elseif($inv->status==='menunggu_verifikasi'){Payment::create(['invoice_id'=>$inv->id,'member_id'=>$m->id,'amount'=>15000,'paid_at'=>now()->subDay(),'status'=>'menunggu_verifikasi']);PaymentProof::create(['original_name'=>'contoh-bukti-transfer.jpg','path_file'=>'demo/sample-proof.jpg','file_size'=>180000,'uploaded_at'=>now()->subDay(),'payment_id'=>Payment::latest('id')->first()->id]);}Notice::create(['user_id'=>$m->id,'invoice_id'=>$inv->id,'title'=>'Informasi iuran kas','body'=>'Tagihan iuran November 2026 tersedia di portal.']);}CashTransaction::create(['type'=>'pengeluaran','category'=>'Operasional','description'=>'Pembelian perlengkapan administrasi','amount'=>50000,'transaction_date'=>now()->subDays(5),'created_by'=>$b->id]);}}
+<?php
+
+namespace Database\Seeders;
+
+use Illuminate\Database\Seeder;
+use App\Models\{User, Department, DuesRule, Invoice, Payment, PaymentProof, CashTransaction, Notice};
+use Illuminate\Support\Facades\Hash;
+
+class DatabaseSeeder extends Seeder
+{
+    public function run(): void
+    {
+        $si = Department::create(['name' => 'Sistem Informasi', 'code' => 'SI']);
+        $ti = Department::create(['name' => 'Teknik Informatika', 'code' => 'TI']);
+        $pti = Department::create(['name' => 'Pendidikan Teknologi Informasi', 'code' => 'PTI']);
+        $b = User::create(['name' => 'Nadia Bendahara', 'nim' => '245150407111001', 'email' => 'bendahara@bemfilkom.test', 'password' => Hash::make('password'), 'role' => 'bendahara', 'status_anggota' => 'aktif', 'department_id' => $si->id]);
+        $k = User::create(['name' => 'Aditya Ketua BEM', 'nim' => '245150407111002', 'email' => 'ketua@bemfilkom.test', 'password' => Hash::make('password'), 'role' => 'ketua', 'status_anggota' => 'aktif', 'department_id' => $ti->id]);
+        $names = ['Alya Putri', 'Rafi Mahendra', 'Dimas Pratama', 'Nabila Zahra', 'Fikri Ramadhan', 'Citra Lestari', 'Bima Saputra', 'Salsa Anindya', 'Rizky Firmansyah', 'Intan Permata'];
+        $deps = [$si, $ti, $pti];
+        foreach ($names as $i => $n) User::create(['name' => $n, 'nim' => '245150407111' . str_pad((string)($i + 10), 3, '0', STR_PAD_LEFT), 'email' => 'anggota' . ($i + 1) . '@bemfilkom.test', 'password' => Hash::make('password'), 'role' => 'anggota', 'status_anggota' => 'aktif', 'department_id' => $deps[$i % 3]->id]);
+        $rule = DuesRule::create(['name' => 'Iuran Kas Rutin', 'period' => 'bulanan', 'amount' => 15000, 'due_day' => 10, 'description' => 'Iuran rutin anggota BEM FILKOM UB', 'active' => true]);
+        $members = User::whereIn('role', ['anggota', 'bendahara', 'ketua'])->get();
+        foreach ($members as $i => $m) {
+            $inv = Invoice::create(['member_id' => $m->id, 'dues_rule_id' => $rule->id, 'period_label' => 'November 2026', 'amount' => 15000, 'due_date' => '2026-11-10', 'status' => $i % 4 === 0 ? 'lunas' : ($i % 4 === 1 ? 'menunggu_verifikasi' : 'belum_bayar')]);
+            if ($inv->status === 'lunas') {
+                $pay = Payment::create(['invoice_id' => $inv->id, 'member_id' => $m->id, 'amount' => 15000, 'paid_at' => now()->subDays(3), 'status' => 'diterima', 'verified_by' => $b->id, 'verified_at' => now()->subDays(2)]);
+                PaymentProof::create(['original_name' => 'contoh-bukti-transfer.jpg', 'path_file' => 'demo/sample-proof.jpg', 'file_size' => 180000, 'uploaded_at' => now()->subDays(3), 'payment_id' => $pay->id]);
+                CashTransaction::create(['type' => 'pemasukan', 'category' => 'Iuran anggota', 'description' => 'Pembayaran ' . $m->name . ' - November 2026', 'amount' => 15000, 'transaction_date' => now()->subDays(2), 'payment_id' => $pay->id, 'created_by' => $b->id]);
+            } elseif ($inv->status === 'menunggu_verifikasi') {
+                Payment::create(['invoice_id' => $inv->id, 'member_id' => $m->id, 'amount' => 15000, 'paid_at' => now()->subDay(), 'status' => 'menunggu_verifikasi']);
+                PaymentProof::create(['original_name' => 'contoh-bukti-transfer.jpg', 'path_file' => 'demo/sample-proof.jpg', 'file_size' => 180000, 'uploaded_at' => now()->subDay(), 'payment_id' => Payment::latest('id')->first()->id]);
+            }
+            Notice::create(['user_id' => $m->id, 'invoice_id' => $inv->id, 'title' => 'Informasi iuran kas', 'body' => 'Tagihan iuran November 2026 tersedia di portal.']);
+        }
+        CashTransaction::create(['type' => 'pengeluaran', 'category' => 'Operasional', 'description' => 'Pembelian perlengkapan administrasi', 'amount' => 50000, 'transaction_date' => now()->subDays(5), 'created_by' => $b->id]);
+    }
+}

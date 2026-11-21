@@ -1,1 +1,35 @@
-<?php use Illuminate\Database\Migrations\Migration;use Illuminate\Database\Schema\Blueprint;use Illuminate\Support\Facades\Schema;return new class extends Migration{public function up():void{Schema::create('departments',function(Blueprint $t){$t->id();$t->string('name');$t->string('code',20)->unique();$t->timestamps();});Schema::create('users',function(Blueprint $t){$t->id();$t->string('name');$t->string('nim',30)->nullable()->unique();$t->string('email')->unique();$t->timestamp('email_verified_at')->nullable();$t->string('password');$t->enum('role',['bendahara','ketua','anggota'])->default('anggota');$t->enum('status_anggota',['aktif','nonaktif'])->default('aktif');$t->foreignId('department_id')->nullable()->constrained()->nullOnDelete();$t->rememberToken();$t->timestamps();});}public function down():void{Schema::dropIfExists('users');Schema::dropIfExists('departments');}};
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration {
+    public function up(): void
+    {
+        Schema::create('departments', function (Blueprint $t) {
+            $t->id();
+            $t->string('name');
+            $t->string('code', 20)->unique();
+            $t->timestamps();
+        });
+        Schema::create('users', function (Blueprint $t) {
+            $t->id();
+            $t->string('name');
+            $t->string('nim', 30)->nullable()->unique();
+            $t->string('email')->unique();
+            $t->timestamp('email_verified_at')->nullable();
+            $t->string('password');
+            $t->enum('role', ['bendahara', 'ketua', 'anggota'])->default('anggota');
+            $t->enum('status_anggota', ['aktif', 'nonaktif'])->default('aktif');
+            $t->foreignId('department_id')->nullable()->constrained()->nullOnDelete();
+            $t->rememberToken();
+            $t->timestamps();
+        });
+    }
+    public function down(): void
+    {
+        Schema::dropIfExists('users');
+        Schema::dropIfExists('departments');
+    }
+};

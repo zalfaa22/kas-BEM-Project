@@ -1,1 +1,27 @@
-<?php use Illuminate\Database\Migrations\Migration;use Illuminate\Database\Schema\Blueprint;use Illuminate\Support\Facades\Schema;return new class extends Migration{public function up():void{Schema::create('invoices',function(Blueprint $t){$t->id();$t->foreignId('member_id')->constrained('users');$t->foreignId('dues_rule_id')->nullable()->constrained()->nullOnDelete();$t->string('period_label');$t->decimal('amount',14,2);$t->date('due_date');$t->enum('status',['belum_bayar','menunggu_verifikasi','lunas','ditolak'])->default('belum_bayar');$t->text('notes')->nullable();$t->timestamps();$t->unique(['member_id','period_label']);});}public function down():void{Schema::dropIfExists('invoices');}};
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration {
+    public function up(): void
+    {
+        Schema::create('invoices', function (Blueprint $t) {
+            $t->id();
+            $t->foreignId('member_id')->constrained('users');
+            $t->foreignId('dues_rule_id')->nullable()->constrained()->nullOnDelete();
+            $t->string('period_label');
+            $t->decimal('amount', 14, 2);
+            $t->date('due_date');
+            $t->enum('status', ['belum_bayar', 'menunggu_verifikasi', 'lunas', 'ditolak'])->default('belum_bayar');
+            $t->text('notes')->nullable();
+            $t->timestamps();
+            $t->unique(['member_id', 'period_label']);
+        });
+    }
+    public function down(): void
+    {
+        Schema::dropIfExists('invoices');
+    }
+};

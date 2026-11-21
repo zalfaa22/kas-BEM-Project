@@ -1,1 +1,25 @@
-<?php use Illuminate\Database\Migrations\Migration;use Illuminate\Database\Schema\Blueprint;use Illuminate\Support\Facades\Schema;return new class extends Migration{public function up():void{Schema::create('dues_rules',function(Blueprint $t){$t->id();$t->string('name');$t->enum('period',['mingguan','bulanan','tahunan']);$t->decimal('amount',14,2);$t->unsignedTinyInteger('due_day')->default(10);$t->text('description')->nullable();$t->boolean('active')->default(true);$t->timestamps();});}public function down():void{Schema::dropIfExists('dues_rules');}};
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration {
+    public function up(): void
+    {
+        Schema::create('dues_rules', function (Blueprint $t) {
+            $t->id();
+            $t->string('name');
+            $t->enum('period', ['mingguan', 'bulanan', 'tahunan']);
+            $t->decimal('amount', 14, 2);
+            $t->unsignedTinyInteger('due_day')->default(10);
+            $t->text('description')->nullable();
+            $t->boolean('active')->default(true);
+            $t->timestamps();
+        });
+    }
+    public function down(): void
+    {
+        Schema::dropIfExists('dues_rules');
+    }
+};

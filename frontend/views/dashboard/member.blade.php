@@ -1,1 +1,57 @@
-@extends('layouts.app') @section('title','Dashboard Saya') @section('crumb','My workspace') @section('content')<div class="welcome-row"><div><span class="eyebrow">MEMBER SPACE</span><h1>Halo, {{ explode(' ',auth()->user()->name)[0] }} <span class="wave">✳</span></h1><p>Yuk, cek status iuran dan pastikan semuanya tetap teratur.</p></div><a class="btn primary" href="{{ route('my-invoices') }}">Lihat semua tagihan →</a></div><div class="hero-banner member-hero"><div><span class="eyebrow">YOUR CONTRIBUTION MATTERS</span><h2>Stay involved.<br><em>Stay up to date.</em></h2><p>Pantau kewajiban kas organisasi melalui satu tempat.</p></div><div class="hero-orbit"><div class="orbit-ring"></div><div class="orbit-core">✳</div></div><div class="hero-pattern"></div></div><div class="stats-grid three"><div class="stat-card"><div class="stat-top"><span>Total tagihan</span><span class="stat-icon mint">▤</span></div><strong>{{ $myInvoices->count() }}</strong><small>Ditampilkan terbaru</small></div><div class="stat-card"><div class="stat-top"><span>Status pembayaran</span><span class="stat-icon yellow">◷</span></div><strong>{{ \App\Models\Invoice::where('member_id',auth()->id())->where('status','lunas')->count() }}</strong><small>Tagihan telah lunas</small></div><div class="stat-card"><div class="stat-top"><span>Pengingat</span><span class="stat-icon peach">♧</span></div><strong>{{ \App\Models\Invoice::where('member_id',auth()->id())->whereIn('status',['belum_bayar','ditolak'])->count() }}</strong><small><a href="{{ route('reminders') }}">Cek pengingat →</a></small></div></div><section class="panel table-panel"><div class="panel-head"><div><span class="eyebrow">YOUR DUES</span><h3>Tagihan terbaru</h3></div><a class="text-link" href="{{ route('my-invoices') }}">Lihat semua →</a></div><div class="table-scroll"><table><thead><tr><th>PERIODE</th><th>JATUH TEMPO</th><th>NOMINAL</th><th>STATUS</th><th>AKSI</th></tr></thead><tbody>@forelse($myInvoices as $inv)<tr><td><b>{{ $inv->period_label }}</b></td><td>{{ $inv->due_date->format('d M Y') }}</td><td class="amount">Rp {{ number_format($inv->amount,0,',','.') }}</td><td><span class="status {{ $inv->status }}">{{ str_replace('_',' ',ucfirst($inv->status)) }}</span></td><td>@if(in_array($inv->status,['belum_bayar','ditolak']))<a class="text-link" href="{{ route('my-invoices') }}">Bayar / Upload →</a>@else—@endif</td></tr>@empty<tr><td colspan="5" class="empty">Belum ada tagihan untuk akun ini.</td></tr>@endforelse</tbody></table></div></section>@endsection
+@extends('layouts.app') @section('title','Dashboard Saya') @section('crumb','My workspace') @section('content')<div class="welcome-row">
+    <div><span class="eyebrow">MEMBER SPACE</span>
+        <h1>Halo, {{ explode(' ',auth()->user()->name)[0] }} <span class="wave">✳</span></h1>
+        <p>Yuk, cek status iuran dan pastikan semuanya tetap teratur.</p>
+    </div><a class="btn primary" href="{{ route('my-invoices') }}">Lihat semua tagihan →</a>
+</div>
+<div class="hero-banner member-hero">
+    <div><span class="eyebrow">YOUR CONTRIBUTION MATTERS</span>
+        <h2>Stay involved.<br><em>Stay up to date.</em></h2>
+        <p>Pantau kewajiban kas organisasi melalui satu tempat.</p>
+    </div>
+    <div class="hero-orbit">
+        <div class="orbit-ring"></div>
+        <div class="orbit-core">✳</div>
+    </div>
+    <div class="hero-pattern"></div>
+</div>
+<div class="stats-grid three">
+    <div class="stat-card">
+        <div class="stat-top"><span>Total tagihan</span><span class="stat-icon mint">▤</span></div><strong>{{ $myInvoices->count() }}</strong><small>Ditampilkan terbaru</small>
+    </div>
+    <div class="stat-card">
+        <div class="stat-top"><span>Status pembayaran</span><span class="stat-icon yellow">◷</span></div><strong>{{ \App\Models\Invoice::where('member_id',auth()->id())->where('status','lunas')->count() }}</strong><small>Tagihan telah lunas</small>
+    </div>
+    <div class="stat-card">
+        <div class="stat-top"><span>Pengingat</span><span class="stat-icon peach">♧</span></div><strong>{{ \App\Models\Invoice::where('member_id',auth()->id())->whereIn('status',['belum_bayar','ditolak'])->count() }}</strong><small><a href="{{ route('reminders') }}">Cek pengingat →</a></small>
+    </div>
+</div>
+<section class="panel table-panel">
+    <div class="panel-head">
+        <div><span class="eyebrow">YOUR DUES</span>
+            <h3>Tagihan terbaru</h3>
+        </div><a class="text-link" href="{{ route('my-invoices') }}">Lihat semua →</a>
+    </div>
+    <div class="table-scroll">
+        <table>
+            <thead>
+                <tr>
+                    <th>PERIODE</th>
+                    <th>JATUH TEMPO</th>
+                    <th>NOMINAL</th>
+                    <th>STATUS</th>
+                    <th>AKSI</th>
+                </tr>
+            </thead>
+            <tbody>@forelse($myInvoices as $inv)<tr>
+                    <td><b>{{ $inv->period_label }}</b></td>
+                    <td>{{ $inv->due_date->format('d M Y') }}</td>
+                    <td class="amount">Rp {{ number_format($inv->amount,0,',','.') }}</td>
+                    <td><span class="status {{ $inv->status }}">{{ str_replace('_',' ',ucfirst($inv->status)) }}</span></td>
+                    <td>@if(in_array($inv->status,['belum_bayar','ditolak']))<a class="text-link" href="{{ route('my-invoices') }}">Bayar / Upload →</a>@else—@endif</td>
+                </tr>@empty<tr>
+                    <td colspan="5" class="empty">Belum ada tagihan untuk akun ini.</td>
+                </tr>@endforelse</tbody>
+        </table>
+    </div>
+</section>@endsection
