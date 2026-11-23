@@ -1621,3 +1621,41 @@ footer {
         background: white;
     }
 }
+
+
+/* SIDEBAR MENU SCROLL */
+.sidebar {
+    height: 100vh;
+    overflow: hidden;
+}
+
+.sidebar nav {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding-right: 4px;
+}
+
+/* Scrollbar sidebar */
+.sidebar nav::-webkit-scrollbar {
+    width: 4px;
+}
+
+.sidebar nav::-webkit-scrollbar-thumb {
+    background: #dce5df;
+    border-radius: 10px;
+}
+
+.sidebar nav::-webkit-scrollbar-thumb:hover {
+    background: #aabbb1;
+}
+
+.sidebar nav::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+/* Bagian bawah tetap terlihat */
+.sidebar-bottom {
+    flex-shrink: 0;
+}

@@ -20,36 +20,36 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
 class PortalController extends Controller
 {
     public function dashboard()
-{
-    $u = request()->user();
+    {
+        $u = request()->user();
 
-    $income = CashTransaction::where('type', 'pemasukan')->sum('amount');
-    $expense = CashTransaction::where('type', 'pengeluaran')->sum('amount');
+        $income = CashTransaction::where('type', 'pemasukan')->sum('amount');
+        $expense = CashTransaction::where('type', 'pengeluaran')->sum('amount');
 
-    $data = [
-        'balance' => $income - $expense,
-        'income' => $income,
-        'expense' => $expense,
-        'members' => User::where('role', 'anggota')->where('status_anggota', 'aktif')->count(),
-        'unpaid' => Invoice::whereIn('status', ['belum_bayar', 'ditolak'])->count(),
-        'pending' => Payment::where('status', 'menunggu_verifikasi')->count(),
-        'paid' => Invoice::where('status', 'lunas')->count(),
-        'recent' => CashTransaction::with('payment')->latest('transaction_date')->take(6)->get(),
-        'myInvoices' => Invoice::where('member_id', $u->id)->latest()->take(5)->get(),
-        'myPayments' => Payment::with(['invoice', 'proof'])->where('member_id', $u->id)->latest()->take(5)->get(),
-        'notices' => Notice::where('user_id', $u->id)->latest()->take(5)->get()
-    ];
+        $data = [
+            'balance' => $income - $expense,
+            'income' => $income,
+            'expense' => $expense,
+            'members' => User::where('role', 'anggota')->where('status_anggota', 'aktif')->count(),
+            'unpaid' => Invoice::whereIn('status', ['belum_bayar', 'ditolak'])->count(),
+            'pending' => Payment::where('status', 'menunggu_verifikasi')->count(),
+            'paid' => Invoice::where('status', 'lunas')->count(),
+            'recent' => CashTransaction::with('payment')->latest('transaction_date')->take(6)->get(),
+            'myInvoices' => Invoice::where('member_id', $u->id)->latest()->take(5)->get(),
+            'myPayments' => Payment::with(['invoice', 'proof'])->where('member_id', $u->id)->latest()->take(5)->get(),
+            'notices' => Notice::where('user_id', $u->id)->latest()->take(5)->get()
+        ];
 
-    if ($u->role === 'anggota') {
-        return view('dashboard.member', $data);
+        if ($u->role === 'anggota') {
+            return view('dashboard.member', $data);
+        }
+
+        if ($u->role === 'ketua') {
+            return view('dashboard.president', $data);
+        }
+
+        return view('dashboard.index', $data);
     }
-
-    if ($u->role === 'ketua') {
-        return view('dashboard.president', $data);
-    }
-
-    return view('dashboard.index', $data);
-}
 
     public function members(Request $r)
     {
@@ -431,7 +431,7 @@ class PortalController extends Controller
             ->whereIn('status', ['belum_bayar', 'ditolak'])
             ->whereDate('due_date', '<=', now()->addDays(7));
 
-        if ($u->role === 'anggota') {
+        if (in_array($u->role, ['anggota', 'ketua'])) {
             $q->where('member_id', $u->id);
         }
 
